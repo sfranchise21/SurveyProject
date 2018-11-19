@@ -1,0 +1,207 @@
+---
+title: "Stat UN2104 -- Take Home Quiz"
+author: "Steven Francis"
+date: "April 28, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo=TRUE}
+job_sat_data <- read.table("jobsat-data.txt", header = T)
+```
+
+```{r, echo=TRUE}
+#Changing numerical variables region and age(groups) into factor variables
+job_sat_data$region <- factor(job_sat_data$region)
+job_sat_data$age <- factor(job_sat_data$age)
+```
+
+Running the crazy saturated logistic regression model
+
+```{r,echo=TRUE}
+job_sat_data.logit1 <- glm(cbind(sat, unsat) ~ region + race + age + gender +
+                             region:race:age:gender + region:race:age + 
+                             region:race:gender + race:gender:age +
+                             age:gender:region + region:race + region:age +
+                             region:gender + race:age + race:gender +
+                             age:gender, data = job_sat_data, family = binomial)
+
+summary(job_sat_data.logit1)
+
+anova(job_sat_data.logit1)
+```
+
+```{r,echo=TRUE}
+pchisq(18.007, df=12, lower.tail = F)
+pchisq(q=19.948, df=12, lower.tail = F)
+pchisq(q=19.959, df=12, lower.tail = F)
+
+```
+
+
+
+Now fitting a relatively simple model
+
+```{r,echo=TRUE}
+job_sat_data.logit2 <- glm(cbind(sat,unsat) ~ region + race + age + gender +
+                             region:age:gender + region:race:age:gender,
+                           data = job_sat_data, family = binomial)
+
+summary(job_sat_data.logit2)
+
+anova(job_sat_data.logit2)
+```
+
+```{r,echo=TRUE}
+pchisq(58.477, df=41, lower.tail = F)
+pchisq(q=39.039, df=32, lower.tail = F)
+
+
+```
+
+```{r,echo=TRUE}
+job_sat_data.logit3 <- glm(cbind(sat,unsat) ~ region + race + age + gender +
+                             region:race:age:gender, data = job_sat_data, 
+                           family = binomial)
+
+summary(job_sat_data.logit3)
+
+anova(job_sat_data.logit3)
+
+
+```
+```{r,echo=TRUE}
+pchisq(q=3.547, df=1, lower.tail = F)
+pchisq(q=97.516, df=73, lower.tail = F)
+```
+
+# THIS MODEL SEEMS TO BE THE BEST OPTION BUT I MIGHT BE ABLE TO PLAY AROUND WITH THIS ONE MORE
+
+```{r,echo=TRUE}
+job_sat_data.logit4 <- glm(cbind(sat,unsat) ~ region + age + gender,
+                           data = job_sat_data, family = binomial)
+
+summary(job_sat_data.logit4)
+
+anova(job_sat_data.logit4)
+```
+```{r,echo=TRUE}
+pchisq(q=39.046, df=32, lower.tail = F)
+
+pchisq(q=(204.141-97.525), df=9, lower.tail = F)
+
+pchisq(q=97.525, df=74, lower.tail = F)
+```
+
+# I AM NOT USING THIS MODEL
+
+```{r,echo=TRUE}
+job_sat_data.logit5 <- glm(cbind(sat,unsat) ~ region + race + age + gender,
+                           data = job_sat_data, family = binomial)
+
+summary(job_sat_data.logit5)
+
+anova(job_sat_data.logit5)
+```
+
+# Another possible model that could be used
+
+```{r,echo=TRUE}
+job_sat_data.logit5 <- glm(cbind(sat,unsat) ~ region + age + gender + 
+                          age*gender, data = job_sat_data, 
+                           family = binomial)
+
+summary(job_sat_data.logit5)
+
+anova(job_sat_data.logit5)
+
+```
+
+```{r, echo=TRUE}
+pchisq(q=58.479, df=42, lower.tail = F)
+
+pchisq(89.564, df=72, lower.tail = F)
+```
+
+```{r,echo=TRUE}
+job_sat_data.logit6 <- glm(cbind(sat,unsat) ~ region + race + age + gender + 
+                         region*age*gender*race, data = job_sat_data, 
+                           family = binomial)
+
+summary(job_sat_data.logit6)
+
+anova(job_sat_data.logit6)
+```
+
+```{r,echo=TRUE}
+#race
+pchisq(3.547, 1, lower.tail = F)
+#region:age:gender
+pchisq(20.173, 12, lower.tail = F)
+#region:race:age
+pchisq(18.295, 12, lower.tail = F)
+#race:age:gender
+pchisq(3.779, 2, lower.tail = F)
+#region:race:age:gender
+pchisq(19.959, 12, lower.tail = F)
+
+```
+
+```{r,echo=TRUE}
+job_sat_data.logit8 <- glm(cbind(sat,unsat) ~ region + race + age + gender + 
+                          region:age:gender, data = job_sat_data, 
+                          family = binomial, na.action = na.omit)
+
+summary(job_sat_data.logit8)
+
+anova(job_sat_data.logit8)
+
+```
+
+```{r,echo=TRUE}
+job_sat_data.logit9 <- glm(cbind(sat,unsat) ~ age + gender + age*gender+ region, 
+                          data = job_sat_data, family = binomial)
+
+summary(job_sat_data.logit9)
+
+anova(job_sat_data.logit9)
+
+```
+
+```{r,echo=TRUE}
+job_sat_data.logit10 <- glm(cbind(sat,unsat) ~ region + race + age + gender +
+                              race*gender,
+                           data = job_sat_data, family = binomial)
+
+summary(job_sat_data.logit10)
+
+anova(job_sat_data.logit10)
+```
+
+
+# I AM NOT USING THIS MODEL
+
+```{r,echo=TRUE}
+job_sat_data.logit4 <- glm(cbind(sat,unsat) ~ region + race + age + gender,
+                           data = job_sat_data, family = binomial)
+
+summary(job_sat_data.logit4)
+
+anova(job_sat_data.logit4)
+```
+
+# Another possible model that could be used
+
+```{r,echo=TRUE}
+job_sat_data.logit5 <- glm(cbind(sat,unsat) ~ region + age + gender + 
+                          age*gender, data = job_sat_data, 
+                           family = binomial)
+
+summary(job_sat_data.logit5)
+
+anova(job_sat_data.logit5)
+
+```

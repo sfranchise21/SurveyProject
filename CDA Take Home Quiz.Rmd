@@ -1,0 +1,110 @@
+---
+title: "STAT UN2104 -- Take Home Quiz"
+author: "Steven Francis"
+date: "May 2, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r,echo=TRUE}
+job_sat_data <- read.table("jobsat-data.txt", header = T)
+```
+
+```{r, echo=TRUE}
+#Changing numerical variables region and age(groups) into factor variables
+job_sat_data$region <- factor(job_sat_data$region)
+job_sat_data$age <- factor(job_sat_data$age)
+```
+
+
+```{r,echo=TRUE}
+job_sat_data.logit <- glm(cbind(sat,unsat) ~ region + race + age + gender +
+                              race*gender,
+                           data = job_sat_data, family = binomial)
+
+summary(job_sat_data.logit)
+
+anova(job_sat_data.logit)
+```
+
+# To test the model's goodness of fit
+
+```{r,echo=TRUE}
+pchisq(q=87.941, df=72, lower.tail = F)
+```
+
+```{r,echo=TRUE}
+#Proving that the residuals follow a relatively follow a standard normal 
+#distribution
+
+library('car')
+qqPlot(job_sat_data.logit$residuals)
+
+```
+
+# Adding observed satisfaction probability percentage, fitted satisfaction probability percentage and fitted satisfaction odds percentage
+
+```{r,echo=TRUE}
+job_sat_data.obs.prop <- job_sat_data$sat/(job_sat_data$sat + job_sat_data$unsat)
+cbind(job_sat_data, job_sat_data.obs.prop, fitted(job_sat_data.logit))
+
+logit.fit.prob <- fitted(job_sat_data.logit)
+logit.fit.odds <- logit.fit.prob/(1-logit.fit.prob)
+
+#Creation of a new data frame with added columns
+sat_data <- cbind(job_sat_data, logit.fit.prob, logit.fit.odds)
+
+sat_data_region1 <- subset(sat_data, region=="1")
+sat_data_region2 <- subset(sat_data, region=="2")
+sat_data_region3 <- subset(sat_data, region=="3")
+sat_data_region4 <- subset(sat_data, region=="4")
+sat_data_region5 <- subset(sat_data, region=="5")
+sat_data_region6 <- subset(sat_data, region=="6")
+sat_data_region7 <- subset(sat_data, region=="7")
+```
+
+
+
+
+
+# Contingency Tables by Race and Region
+
+```{r,echo=TRUE}
+sat_data_race_w <- subset(sat_data, race=="w") 
+sat_data_race_o <- subset(sat_data, race=="o") 
+```
+
+# Contingency Tables by Age Group, and Region
+
+```{r,echo=TRUE}
+sat_data_age1 <- subset(sat_data, age=="1") 
+sat_data_age2 <- subset(sat_data, age=="2")
+sat_data_age3 <- subset(sat_data, age=="3") 
+```
+
+# Contingency Table by Gender and Region
+
+```{r,echo=TRUE}
+sat_data_f <- subset(sat_data, gender=="f")
+sat_data_m <- subset(sat_data, gender=="m")
+```
+
+```{r, echo=TRUE}
+sat_data_w_m <- subset(sat_data, race=="w" & gender =="m")
+sat_data_w_f <- subset(sat_data, race=="w" & gender =="f")
+sat_data_o_m <- subset(sat_data, race=="o" & gender =="m")
+sat_data_o_f <- subset(sat_data, race=="o" & gender =="f")
+```
+
+
+
+
+
+
+
+
+
